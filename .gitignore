@@ -1,0 +1,58 @@
+# ---- Python / Django ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+develop-eggs/
+*.manifest
+*.spec
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Django stuff:
+*.log
+local_settings.py
+media/              # user-uploaded files (better to store externally in prod)
+staticfiles/        # Django collected static files (collected via collectstatic)
+backend/static/     # build artifacts, not source-managed
+
+# ---- PostgreSQL ----
+*.sql
+*.dump
+*.backup
+
+# ---- Node.js / React ----
+frontend/node_modules/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnp/
+frontend/.pnp.js
+frontend/.pnp.cjs
+
+# React build output (generated)
+frontend/build/
+frontend/dist/
+frontend/.cache/
+
+# ---- Lock files (decide per team) ----
+# Usually keep these in git for reproducible installs
+# package-lock.json
+# yarn.lock
+
+# ---- Editor & OS junk ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
