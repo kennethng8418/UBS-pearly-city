@@ -31,7 +31,7 @@ Build a **modular web application** with:
 ## 🏗️ System Architecture
 **High-level design:**
 
-![Alt text](https://imgur.com/a/T8w2LKE)
+![Alt text](https://i.imgur.com/ufBbTuU.png)
 
 - **Journey Input Form**
   - Users can enter up to **20 journeys per day**.
