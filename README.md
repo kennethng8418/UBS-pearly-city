@@ -1,4 +1,4 @@
-# PearlCard Fare Calculator
+# Pearly City Card Fare Calculator
 
 ## 📌 Problem Summary
 The **Pearly City Metro** system is divided into zones (Zone 1, Zone 2, Zone 3, etc.).  
