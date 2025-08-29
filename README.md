@@ -31,6 +31,8 @@ Build a **modular web application** with:
 ## 🏗️ System Architecture
 **High-level design:**
 
+![Alt text](https://imgur.com/a/T8w2LKE)
+
 - **Journey Input Form**
   - Users can enter up to **20 journeys per day**.
   - Each journey requires a `from_zone` and `to_zone`.
