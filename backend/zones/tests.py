@@ -5,7 +5,7 @@ Test Zone model with missing name using Django test database.
 import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from zones.models import Zone  # or from apps.zones.models import Zone
+from zones.models import Zone 
 
 
 @pytest.mark.django_db

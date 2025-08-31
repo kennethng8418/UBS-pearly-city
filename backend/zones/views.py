@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import viewsets
 from django.shortcuts import render, get_object_or_404
-from .models import Zone
-from .serializers import ZoneSerializer
+from zones.models import Zone
+from zones.serializers import ZoneSerializer
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")

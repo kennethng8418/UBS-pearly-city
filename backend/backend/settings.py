@@ -40,7 +40,9 @@ INSTALLED_APPS = [
         # Third party
     'rest_framework',
     'corsheaders',
-    'zones',
+    'zones',   # Existing - keeps Zone model
+    'fare',    # NEW - Business logic (no models)
+    'api',
 
 ]
 
@@ -135,3 +137,16 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}

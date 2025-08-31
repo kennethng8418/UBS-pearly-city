@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Zone
+from zones.models import Zone
 
 # Method 1: Simple Registration
 # This gives you a basic admin interface with default settings
