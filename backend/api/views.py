@@ -22,20 +22,20 @@ class CalculateFareAPIView(APIView):
     """
     Calculate fare for a single journey.
     
-    POST /api/v1/calculate-fare/
+    POST /api/calculate-fare/
     
     Request:
         {
-            "from_zone": 1,
-            "to_zone": 2
+            "from_zone": "1",
+            "to_zone": "2"
         }
     
     Response:
         {
             "success": true,
             "data": {
-                "from_zone": 1,
-                "to_zone": 2,
+                "from_zone": "1",
+                "to_zone": "2",
                 "fare": 55
             }
         }
