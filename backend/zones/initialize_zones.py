@@ -10,9 +10,9 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         zones_data = [
-            {'zone_number': 1, 'name': 'Central', 'description': 'City center zone'},
-            {'zone_number': 2, 'name': 'Inner Ring', 'description': 'Inner suburban zone'},
-            {'zone_number': 3, 'name': 'Outer Ring', 'description': 'Outer suburban zone'},
+            {'zone_number': "1", 'name': 'Central', 'description': 'City center zone'},
+            {'zone_number': "2", 'name': 'Inner Ring', 'description': 'Inner suburban zone'},
+            {'zone_number': "3", 'name': 'Outer Ring', 'description': 'Outer suburban zone'},
         ]
         
         for data in zones_data:

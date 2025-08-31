@@ -13,6 +13,7 @@ class ZoneSerializer(serializers.ModelSerializer):
     
     def validate_zone_number(self, value):
         """Ensure zone_number is positive."""
-        if value < 1 and value > 3:
-            raise serializers.ValidationError("Zone number must be at least 1 and less than 4.")
+        zones = ["Zone 1", "Zone 2", "Zone 3"]
+        if value not in zones:
+            raise serializers.ValidationError("Zone number must be inbetween Zone 1 and Zone 2.")
         return value

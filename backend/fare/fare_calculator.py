@@ -26,20 +26,20 @@ class SimpleFareCalculator:
     """
     
     # Valid zone numbers
-    VALID_ZONES = {1, 2, 3}
+    VALID_ZONES = {"1", "2", "3"}
     
     # Fare for same zone travel
     SAME_ZONE_FARES = {
-        1: 40,
-        2: 35,
-        3: 30
+        "1": 40,
+        "2": 35,
+        "3": 30
     }
     
     # Fare for different zone travel (bidirectional)
     DIFFERENT_ZONE_FARES = {
-        (1, 2): 55,  # Zone 1 <-> Zone 2
-        (1, 3): 65,  # Zone 1 <-> Zone 3
-        (2, 3): 45,  # Zone 2 <-> Zone 3
+        ("1", "2"): 55,  # Zone 1 <-> Zone 2
+        ("1", "3"): 65,  # Zone 1 <-> Zone 3
+        ("2", "3"): 45,  # Zone 2 <-> Zone 3
     }
     
     @classmethod

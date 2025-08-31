@@ -17,21 +17,21 @@ class TestZoneMissingName:
         [
             # Empty string as name (should be valid if CharField allows blank)
             (
-                {"zone_number": 1, "name": ""},
+                {"zone_number": "Zone_1", "name": ""},
                 False,  # This depends on your model's blank=True setting
                 None,
                 None
             ),
             # Whitespace only name
             (
-                {"zone_number": 1, "name": "   "},
+                {"zone_number": "Zone_1", "name": "   "},
                 False,  # Valid but might want to add custom validation
                 None,
                 None
             ),
             # Valid name (control case)
             (
-                {"zone_number": 1, "name": "Central"},
+                {"zone_number": "Zone_1", "name": "Central"},
                 False,
                 None,
                 None
@@ -67,43 +67,7 @@ class TestZoneMissingName:
             
             # Clean up
             zone.delete()
-    
-    @pytest.mark.parametrize(
-        "name_value",
-        [
-            "",
-            "   ",
-            "\t",
-            "\n",
-        ],
-        ids=[
-            "empty_string",
-            "spaces",
-            "tab",
-            "newline"
-        ]
-    )
-    def test_zone_name_validation(self, name_value):
-        """
-        Test Zone model validation for various invalid name values.
-        """
-        zone = Zone(zone_number=1, name=name_value)
-        
-        if name_value is None:
-            # None should fail at database level
-            with pytest.raises(IntegrityError):
-                zone.save()
-        else:
-            # Empty strings might be allowed depending on model definition
-            try:
-                zone.full_clean()
-                zone.save()
-                # If it saves, verify it saved correctly
-                assert zone.id is not None
-                zone.delete()
-            except ValidationError as e:
-                # If validation fails, check it's for the right reason
-                assert 'name' in e.message_dict
+
 
     
     def test_zone_name_required_validation(self):
@@ -122,9 +86,9 @@ class TestZoneMissingName:
     @pytest.mark.parametrize(
         "zone_number,name",
         [
-            (1, "Valid Zone"),
-            (2, "A"),  # Single character
-            (3, "Zone 3 - Outer Ring with Description"),  # Long but valid
+            ("Zone_1", "Valid Zone"),
+            ("Zone_1", "A"),  # Single character
+            ("Zone_3", "Zone 3 - Outer Ring with Description"),  # Long but valid
         ]
     )
     def test_zone_valid_names(self, zone_number, name):

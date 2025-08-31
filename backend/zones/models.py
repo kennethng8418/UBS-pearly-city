@@ -7,11 +7,14 @@ class Zone(models.Model):
     Model representing a metro zone in the PearlCard system.
     """
     
-    zone_number = models.IntegerField(
-        unique=True,
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
-        help_text="Unique zone identifier (e.g., 1 for Zone 1)"
-    )
+    ZONE_CHOICES = [
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "3"),
+    ]
+
+    zone_number = models.CharField(max_length=20, choices=ZONE_CHOICES, unique=True)
+
     
     name = models.CharField(
         max_length=100,

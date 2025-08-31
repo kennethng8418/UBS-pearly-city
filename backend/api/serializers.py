@@ -10,18 +10,8 @@ class JourneyInputSerializer(serializers.Serializer):
     """
     Validates a single journey input.
     """
-    from_zone = serializers.IntegerField(
-        min_value=1,
-        max_value=3,
-        required=True,
-        help_text="Starting zone (1-3)"
-    )
-    to_zone = serializers.IntegerField(
-        min_value=1,
-        max_value=3,
-        required=True,
-        help_text="Destination zone (1-3)"
-    )
+    from_zone = serializers.CharField(required=True)
+    to_zone = serializers.CharField(required=True)
 
 class ZoneSerializer(serializers.ModelSerializer):
     """
