@@ -1,0 +1,32 @@
+[
+    {
+      "model": "zones.zone",
+      "pk": 1,
+      "fields": {
+        "zone_number": "1",
+        "name": "Central Zone",
+        "description": "Covers downtown",
+        "is_active": true
+      }
+    },
+    {
+      "model": "zones.zone",
+      "pk": 2,
+      "fields": {
+        "zone_number": "2",
+        "name": "North Zone",
+        "description": "Residential area",
+        "is_active": true
+      }
+    },
+    {
+      "model": "zones.zone",
+      "pk": 3,
+      "fields": {
+        "zone_number": "3",
+        "name": "South Zone",
+        "description": "Industrial zone",
+        "is_active": true
+      }
+    }
+  ]

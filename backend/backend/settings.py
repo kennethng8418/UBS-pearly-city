@@ -40,14 +40,15 @@ INSTALLED_APPS = [
         # Third party
     'rest_framework',
     'corsheaders',
-    'zones',   # Existing - keeps Zone model
-    'fare',    # NEW - Business logic (no models)
+    'zones',   
+    'fare',  
     'api',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

@@ -86,9 +86,9 @@ class TestZoneMissingName:
     @pytest.mark.parametrize(
         "zone_number,name",
         [
-            ("Zone_1", "Valid Zone"),
-            ("Zone_1", "A"),  # Single character
-            ("Zone_3", "Zone 3 - Outer Ring with Description"),  # Long but valid
+            ("1", "Valid Zone"),
+            ("1", "A"),  # Single character
+            ("3", "Zone 3 - Outer Ring with Description"),  # Long but valid
         ]
     )
     def test_zone_valid_names(self, zone_number, name):

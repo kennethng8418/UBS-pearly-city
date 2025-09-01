@@ -82,7 +82,7 @@ class CalculateFareAPIView(APIView):
                     "error": f"Maximum {MAX_JOURNEYS_PER_DAY} journeys per day exceeded. "
                             f"You already have {existing_journeys_count} journeys today."
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_429_TOO_MANY_REQUESTS
             )
 
         try:
