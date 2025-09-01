@@ -16,12 +16,16 @@ from django.utils import timezone
 
 from .serializers import (
     JourneyInputSerializer,
+    JourneyCalculationSerializer,
     JourneySerializer,
     ZoneSerializer,
     FareRuleSerializer,
-    JourneyHistorySerializer
+    JourneyHistorySerializer,
+    FareCalculationResponseSerializer,
 )
+ZONE = {'1','2','3'}
 
+MAX_JOURNEYS_PER_DAY = 20
 
 class CalculateFareAPIView(APIView):
     '''
@@ -31,17 +35,18 @@ class CalculateFareAPIView(APIView):
     
     Request:
         {   'user_id': '1',
-            'from_zone': '1',
-            'to_zone': '2'
+            journeys: [{'from_zone': '1','to_zone': '2'},
+                {'from_zone': '2','to_zone': '2'}
+            ]
         }
     
     Response:
         {
             'success': true,
             'data': {
-                'from_zone': '1',
-                'to_zone': '2',
-                'fare': 55
+                'user_id': '1',
+                journeys:[...],
+                total_fare: 90,
             }
         }
     '''
@@ -49,7 +54,7 @@ class CalculateFareAPIView(APIView):
     def post(self, request):
         '''Handle single fare calculation request.'''
         # Validate input
-        serializer = JourneyInputSerializer(data=request.data)
+        serializer = JourneyCalculationSerializer(data=request.data)
         
         if not serializer.is_valid():
             return Response(
@@ -61,11 +66,8 @@ class CalculateFareAPIView(APIView):
             )
         
         # Extract validated data
-        from_zone = serializer.validated_data['from_zone']
-        to_zone = serializer.validated_data['to_zone']
+        journeys = serializer.validated_data['journeys']
         user_id = serializer.validated_data['user_id']
-
-        MAX_JOURNEYS_PER_DAY = 20
 
         # Count how many journeys this user has already made today
         today = timezone.now().date()
@@ -87,33 +89,40 @@ class CalculateFareAPIView(APIView):
 
         try:
             # Calculate fare using SimpleFareCalculator
-            fare = SimpleFareCalculator.calculate_single_fare(from_zone, to_zone)
-            journey = Journey.objects.create(
-                user_id = str(user_id), #extend requirement to make storage as user_id 
-                from_zone=str(from_zone),
-                to_zone=str(to_zone),
-                fare=int(fare),  # Store as integer
-            )
+            result = SimpleFareCalculator.calculate_batch_fares(journeys)
+            result['user_id'] = user_id
+            for jour in result['journeys']:
+                # Extract zones
+                from_zone = jour.get('from_zone')
+                to_zone = jour.get('to_zone')
+                fare = jour.get('fare')
+                if from_zone not in ZONE or to_zone not in ZONE:
+                    return Response(
+                    {
+                        'success': False,
+                        'error': 'zone is invalid'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                journey = Journey.objects.create(
+                    user_id = str(user_id), #extend requirement to make storage as user_id 
+                    from_zone=str(from_zone),
+                    to_zone=str(to_zone),
+                    fare=int(fare),  # Store as integer
+                )
 
-            journey_serializer = JourneySerializer(journey)
 
             # Prepare response data
-            response_data = {
-                'user_id': journey.user_id,
-                'journey_id': journey.id,
-                'from_zone': from_zone,
-                'to_zone': to_zone,
-                'fare': fare,
-                'timestamp': journey.timestamp
-            }
-            
+            response_serializer = FareCalculationResponseSerializer(result)
+
             return Response(
                 {
                     'success': True,
-                    'data': response_data
+                    'data': response_serializer.data
                 },
                 status=status.HTTP_200_OK
             )
+            
             
         except ValueError as e:
             # Handle calculation errors

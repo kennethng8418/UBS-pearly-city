@@ -5,14 +5,29 @@ Simple and focused on the fare calculation use case.
 from rest_framework import serializers
 from zones.models import Zone
 from fare.models import Journey
-
 class JourneyInputSerializer(serializers.Serializer):
     """
     Validates a single journey input.
     """
-    user_id = serializers.CharField(required=True)
     from_zone = serializers.CharField(required=True)
     to_zone = serializers.CharField(required=True)
+
+class JourneyCalculationSerializer(serializers.Serializer):
+    """Serializer for fare calculation request"""
+    user_id = serializers.CharField(required=True)
+    journeys = JourneyInputSerializer(many=True, max_length=20)
+class JourneyResultSerializer(serializers.Serializer):
+    """Serializer for journey with calculated fare"""
+    from_zone = serializers.IntegerField()
+    to_zone = serializers.IntegerField()
+    fare = serializers.IntegerField()
+    error = serializers.CharField(required=False)
+class FareCalculationResponseSerializer(serializers.Serializer):
+    """Serializer for fare calculation response"""
+    journeys = JourneyResultSerializer(many=True)
+    total_fare = serializers.IntegerField()
+    journey_count = serializers.IntegerField()
+    user_id = serializers.CharField(required=False)
 
 class ZoneSerializer(serializers.ModelSerializer):
     """
