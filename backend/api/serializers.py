@@ -10,6 +10,7 @@ class JourneyInputSerializer(serializers.Serializer):
     """
     Validates a single journey input.
     """
+    user_id = serializers.CharField(required=True)
     from_zone = serializers.CharField(required=True)
     to_zone = serializers.CharField(required=True)
 
