@@ -43,7 +43,7 @@ class SimpleFareCalculator:
     }
     
     @classmethod
-    def calculate_single_fare(cls, from_zone: int, to_zone: int) -> float:
+    def calculate_single_fare(cls, from_zone: int, to_zone: int) -> int:
         """
         Calculate fare for a single journey.
         
@@ -53,8 +53,8 @@ class SimpleFareCalculator:
             
         Returns:
                     {
-            "from_zone": 1,
-            "to_zone": 2,
+            "from_zone": "1",
+            "to_zone": "2",
             "fare": 55,
 
         }
@@ -70,16 +70,13 @@ class SimpleFareCalculator:
         
         # Same zone travel
         if from_zone == to_zone:
-            return {
-            'fare': cls.SAME_ZONE_FARES[from_zone],
-            }
+            return cls.SAME_ZONE_FARES[from_zone]
+        
         
         # Different zone travel (handle bidirectional by sorting)
         zone_pair = tuple(sorted([from_zone, to_zone]))
-        return {
-            'fare': cls.DIFFERENT_ZONE_FARES[zone_pair],
-        }
-    
+        return cls.DIFFERENT_ZONE_FARES[zone_pair]
+
     @classmethod
     def calculate_batch_fares(cls, journeys: List[Dict]) -> Dict:
         """

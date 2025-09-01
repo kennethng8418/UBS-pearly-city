@@ -11,10 +11,14 @@ from django.utils.decorators import method_decorator
 
 from fare import SimpleFareCalculator
 from zones.models import Zone
+from fare.models import Journey  # Add this import
+
 from .serializers import (
     JourneyInputSerializer,
+    JourneySerializer,
     ZoneSerializer,
-    FareRuleSerializer
+    FareRuleSerializer,
+    JourneyHistorySerializer
 )
 
 
@@ -61,13 +65,23 @@ class CalculateFareAPIView(APIView):
         
         try:
             # Calculate fare using SimpleFareCalculator
-            journey = SimpleFareCalculator.calculate_single_fare(from_zone, to_zone)
-            
+            fare = SimpleFareCalculator.calculate_single_fare(from_zone, to_zone)
+            journey = Journey.objects.create(
+                user_id = "1", #extend requirement to make storage as user_id 
+                from_zone=str(from_zone),
+                to_zone=str(to_zone),
+                fare=int(fare),  # Store as integer
+            )
+
+            journey_serializer = JourneySerializer(journey)
+
             # Prepare response data
             response_data = {
+                'journey_id': journey.id,
                 'from_zone': from_zone,
                 'to_zone': to_zone,
-                'fare': journey['fare']
+                'fare': fare,
+                'timestamp': journey.timestamp
             }
             
             return Response(
@@ -130,3 +144,20 @@ class FareRulesAPIView(APIView):
             'count': len(rules)
         }, status=status.HTTP_200_OK)
 
+class JourneyHistoryAPIView(APIView):
+    """
+    Get journey history.
+    
+    GET /api/journeys/
+    """
+    
+    def get(self, request):
+        """Get journey history """
+        # Get journey history
+        journeys = Journey.objects.all()
+        serializer = JourneyHistorySerializer(journeys, many=True)
+        return Response({
+            'success': True,
+            'journeys': serializer.data,
+            'count': journeys.count()
+        }, status=status.HTTP_200_OK)

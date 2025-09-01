@@ -4,7 +4,7 @@ Simple and focused on the fare calculation use case.
 """
 from rest_framework import serializers
 from zones.models import Zone
-
+from fare.models import Journey
 
 class JourneyInputSerializer(serializers.Serializer):
     """
@@ -31,3 +31,51 @@ class FareRuleSerializer(serializers.Serializer):
     to_zone = serializers.IntegerField(read_only=True)
     fare = serializers.FloatField(read_only=True)
     route = serializers.CharField(read_only=True)
+
+class JourneySerializer(serializers.ModelSerializer):
+    """
+    Serializer for Journey model.
+    Returns journey with fare.
+    """
+    fare_display = serializers.IntegerField(read_only=True)
+    
+    class Meta:
+        model = Journey
+        fields = [
+            'id',
+            'user_id',
+            'from_zone',
+            'to_zone',
+            'fare',
+            'timestamp',
+
+        ]
+        read_only_fields = ['id', 'timestamp']
+    
+class JourneyCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating a Journey.
+    """
+    class Meta:
+        model = Journey
+        fields = ['from_zone', 'to_zone', 'fare']
+
+
+class JourneyHistorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for journey history listing.
+    """
+
+    class Meta:
+        model = Journey
+        fields = [
+            'id',
+            'user_id',
+            'from_zone',
+            'to_zone',
+            'fare',
+            'timestamp',
+
+        ]
+        read_only_fields = ['id', 'timestamp']
+
