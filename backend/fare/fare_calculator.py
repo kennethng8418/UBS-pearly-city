@@ -107,7 +107,7 @@ class SimpleFareCalculator:
             journeys = journeys[:20]
         
         results = []
-        fare = 0.0
+        total_fare = 0
         
         for idx, journey in enumerate(journeys, 1):
             try:
@@ -130,7 +130,7 @@ class SimpleFareCalculator:
                     'fare': fare,
                     'status': 'success'
                 })
-                fare += fare
+                total_fare += fare
                 
             except (ValueError, TypeError, KeyError) as e:
                 # Handle errors gracefully
@@ -145,7 +145,7 @@ class SimpleFareCalculator:
         
         return {
             'journeys': results,
-            'fare': round(fare, 2),
+            'total_fare': total_fare,
             'journey_count': len(results)
         }
     

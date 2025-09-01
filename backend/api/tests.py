@@ -18,32 +18,44 @@ class TestSingleJourneyAPISimple:
         '''Test fare from Zone 1 to Zone 2 (should be 55).'''
         response = self.client.post(
             self.url,
-            data={'user_id':'1', 'from_zone': '1', 'to_zone': '2'},
+            data={'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '2'}]},
             format='json'
         )
         
         assert response.status_code == 200
         data = response.json()
         assert data['success'] is True
-        assert data['data']['fare'] == 55
-    
+        assert data['data']['total_fare'] == 55
+
     def test_calculate_fare_same_zone(self):
         '''Test fare within same zone.'''
         response = self.client.post(
             self.url,
-            data={'user_id':'1', 'from_zone': '1', 'to_zone': '1'},
+            data={'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '1'}]},
             format='json'
         )
         
         assert response.status_code == 200
         data = response.json()
-        assert data['data']['fare'] == 40
+        assert data['data']['total_fare'] == 40
+
+    def test_calculate_fare_multiple_journeys(self):
+        '''Test fare within same zone.'''
+        response = self.client.post(
+            self.url,
+            data={'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '1'},{'from_zone': '1', 'to_zone': '2'}]},
+            format='json'
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data['data']['total_fare'] == 95
     
     def test_calculate_fare_invalid_zone(self):
         '''Test with invalid zone number.'''
         response = self.client.post(
             self.url,
-            data={'user_id':'1', 'from_zone': '1', 'to_zone': '5'},
+            data={'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '5'},{'from_zone': '1', 'to_zone': '2'}]},
             format='json'
         )
         
@@ -63,7 +75,7 @@ class TestSingleJourneyAPISimple:
         assert response.status_code == 400
         data = response.json()
         assert data['success'] is False
-    
+
     def test_all_fare_combinations(self):
         '''Test all valid fare combinations.'''
         test_cases = [
@@ -81,13 +93,13 @@ class TestSingleJourneyAPISimple:
         for from_zone, to_zone, expected_fare in test_cases:
             response = self.client.post(
                 self.url,
-                data={'user_id':'1','from_zone': from_zone, 'to_zone': to_zone},
+                data={'user_id':'1','journeys':[{'from_zone': from_zone, 'to_zone': to_zone}]},
                 format='json'
             )
             
             assert response.status_code == 200
             data = response.json()
-            actual_fare = data['data']['fare']
+            actual_fare = data['data']['total_fare']
             assert actual_fare == expected_fare, \
                 f'Zone {from_zone}→{to_zone}: expected {expected_fare}, got {actual_fare}'
             
@@ -111,7 +123,7 @@ class TestJourneyPersistence:
         # Make fare calculation request
         response = self.client.post(
             self.url,
-            data={'user_id':'1', 'from_zone': '1', 'to_zone': '2'},
+            data={'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '2'}]},
             format='json'
         )
         
@@ -125,34 +137,15 @@ class TestJourneyPersistence:
         assert journey.from_zone == '1'
         assert journey.to_zone == '2'
         assert journey.fare == 55 
-    
-    def test_journey_id_returned_in_response(self):
-        '''Test that API returns journey ID in response.'''
-        response = self.client.post(
-            self.url,
-            data={'user_id':'1', 'from_zone': '2', 'to_zone': '3'},
-            format='json'
-        )
-        
-        assert response.status_code == 200
-        data = response.json()
-        
-        assert 'journey_id' in data['data']
-        assert 'timestamp' in data['data']
-        
-        # Verify journey exists in database
-        journey_id = data['data']['journey_id']
-        journey = Journey.objects.get(id=journey_id)
-        assert journey.fare == 45
-    
+       
     
     def test_multiple_journeys_saved(self):
         '''Test that multiple journey calculations are saved.'''
         # Make multiple fare calculations
         journeys_data = [
-            {'user_id':'1', 'from_zone': '1', 'to_zone': '1'},  
-            {'user_id':'1', 'from_zone': '1', 'to_zone': '2'},  
-            {'user_id':'1', 'from_zone': '2', 'to_zone': '3'}, 
+            {'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '1'}]},  
+            {'user_id':'1', 'journeys':[{'from_zone': '1', 'to_zone': '2'}]},  
+            {'user_id':'1', 'journeys':[{'from_zone': '3', 'to_zone': '2'}]}, 
         ]
         
         initial_count = Journey.objects.count()
@@ -199,26 +192,6 @@ class TestUserJourneyAPI:
         # Anonymous user journey
         Journey.objects.create(user_id='anonymous', from_zone='3', to_zone='3', fare=30)
     
-    def test_calculate_fare_with_user_id(self):
-        '''Test fare calculation saves user_id.'''
-        response = self.client.post(
-            '/api/calculate-fare/',
-            data={
-                'user_id': 'test_user',
-                'from_zone': 1,
-                'to_zone': 2
-            },
-            format='json'
-        )
-        
-        assert response.status_code == 200
-        data = response.json()
-        assert data['success'] is True
-        assert data['data']['user_id'] == 'test_user'
-        
-        # Verify saved in database
-        journey = Journey.objects.get(id=data['data']['journey_id'])
-        assert journey.user_id == 'test_user'
     
     def test_get_user_journey_history(self):
         '''Test retrieving journey history for specific user.'''
