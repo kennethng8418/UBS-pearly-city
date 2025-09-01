@@ -2,7 +2,7 @@ import pytest
 import json
 from rest_framework import status
 from rest_framework.test import APIClient
-
+from fare.models import Journey
 
 @pytest.mark.django_db
 class TestSingleJourneyAPISimple:
@@ -90,3 +90,103 @@ class TestSingleJourneyAPISimple:
             actual_fare = data['data']['fare']
             assert actual_fare == expected_fare, \
                 f"Zone {from_zone}→{to_zone}: expected {expected_fare}, got {actual_fare}"
+            
+
+
+@pytest.mark.django_db
+class TestJourneyPersistence:
+    """Test that journeys are saved to database."""
+    
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        """Setup for each test."""
+        self.client = APIClient()
+        self.url = '/api/calculate-fare/'
+    
+    def test_journey_saved_on_fare_calculation(self):
+        """Test that calculating fare saves journey to database."""
+        # Check initial count
+        initial_count = Journey.objects.count()
+        
+        # Make fare calculation request
+        response = self.client.post(
+            self.url,
+            data={'from_zone': "1", 'to_zone': "2"},
+            format='json'
+        )
+        
+        assert response.status_code == 200
+        
+        # Check journey was saved
+        assert Journey.objects.count() == initial_count + 1
+        
+        # Get the saved journey
+        journey = Journey.objects.latest('timestamp')
+        assert journey.from_zone == "1"
+        assert journey.to_zone == "2"
+        assert journey.fare == 55 
+    
+    def test_journey_id_returned_in_response(self):
+        """Test that API returns journey ID in response."""
+        response = self.client.post(
+            self.url,
+            data={'from_zone': "2", 'to_zone': "3"},
+            format='json'
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert 'journey_id' in data['data']
+        assert 'timestamp' in data['data']
+        
+        # Verify journey exists in database
+        journey_id = data['data']['journey_id']
+        journey = Journey.objects.get(id=journey_id)
+        assert journey.fare == 45
+    
+    def test_journey_history_endpoint(self):
+        """Test journey history retrieval."""
+        # Create some journeys
+        Journey.objects.create(from_zone="1", to_zone="2", fare=55)
+        Journey.objects.create(from_zone="2", to_zone="3", fare=45)
+        Journey.objects.create(from_zone="3", to_zone="3", fare=30)
+        
+        # Get journey history
+        response = self.client.get('/api/journeys/')
+        
+        assert response.status_code == 200
+        data = response.json()
+        
+        assert data['success'] is True
+    
+
+    
+    def test_multiple_journeys_saved(self):
+        """Test that multiple journey calculations are saved."""
+        # Make multiple fare calculations
+        journeys_data = [
+            {'from_zone': "1", 'to_zone': "1"},  
+            {'from_zone': "1", 'to_zone': "2"},  
+            {'from_zone': "2", 'to_zone': "3"}, 
+        ]
+        
+        initial_count = Journey.objects.count()
+        
+        for journey_data in journeys_data:
+            response = self.client.post(
+                self.url,
+                data=journey_data,
+                format='json'
+            )
+            assert response.status_code == 200
+        
+        # Check all journeys were saved
+        assert Journey.objects.count() == initial_count + 3
+        
+        # Verify fares
+        journeys = Journey.objects.order_by('-timestamp')[:3]
+        fares = [j.fare for j in journeys]
+        assert 40 in fares 
+        assert 55 in fares  
+        assert 45 in fares  
