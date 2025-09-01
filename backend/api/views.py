@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from fare import SimpleFareCalculator
 from zones.models import Zone
 from fare.models import Journey  # Add this import
+from django.utils import timezone
 
 from .serializers import (
     JourneyInputSerializer,
@@ -63,6 +64,26 @@ class CalculateFareAPIView(APIView):
         from_zone = serializer.validated_data['from_zone']
         to_zone = serializer.validated_data['to_zone']
         user_id = serializer.validated_data['user_id']
+
+        MAX_JOURNEYS_PER_DAY = 20
+
+        # Count how many journeys this user has already made today
+        today = timezone.now().date()
+
+        existing_journeys_count = Journey.objects.filter(
+            user_id=user_id,
+            timestamp__date=today
+        ).count()
+
+        if existing_journeys_count >= MAX_JOURNEYS_PER_DAY:
+            return Response(
+                {
+                    "success": False,
+                    "error": f"Maximum {MAX_JOURNEYS_PER_DAY} journeys per day exceeded. "
+                            f"You already have {existing_journeys_count} journeys today."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             # Calculate fare using SimpleFareCalculator
@@ -169,7 +190,6 @@ class UserJourneyHistoryAPIView(APIView):
     Get journey history for a specific user.
     
     GET /api/users/{user_id}/journeys/
-    GET /api/user-journeys/?user_id={user_id}
     '''
     
     def get(self, request, user_id=None):
