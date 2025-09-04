@@ -1,22 +1,41 @@
+// App.tsx
+
 import React from 'react';
-import FareCalculator from './components/FareCalculator/FareCalculator';
+import JourneyForm from './components/FareCalculator/JourneyForm';
 import './App.css';
 
-function App() {
+// Utility function to get or generate user ID
+
+
+const App: React.FC = () => {
+  const userId = '1';
+
   return (
-    <div className="App">
+    <div className="app">
       <header className="app-header">
-        <h1>🚇 PearlCard Metro System</h1>
-        <p>Welcome to Pearly City's Metro Fare Calculator</p>
+        <div className="header-content">
+          <h1>PearlCard Metro Fare Calculator</h1>
+          <p className="header-subtitle">Calculate your daily journey fares</p>
+          {userId && (
+            <div className="user-info">
+              <span className="user-label">User ID:</span>
+              <span className="user-id">{userId}</span>
+            </div>
+          )}
+        </div>
       </header>
+
       <main className="app-main">
-        <FareCalculator />
+        {userId ? (
+          <JourneyForm />
+        ) : (
+          <div className="loading-container">
+            <p>Loading...</p>
+          </div>
+        )}
       </main>
-      <footer className="app-footer">
-        <p>© 2024 PearlCard Metro System. All rights reserved.</p>
-      </footer>
     </div>
   );
-}
+};
 
 export default App;

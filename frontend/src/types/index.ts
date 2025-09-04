@@ -1,11 +1,7 @@
-/**
- * Type definitions for the PearlCard application
- */
-
 export interface Zone {
-  zone_number: number;
-  name: string;
-  description: string;
+  id: number;
+  zone_number: string;
+  zone_name: string;
   is_active: boolean;
 }
 
@@ -15,30 +11,39 @@ export interface ZoneListResponse {
   count: number;
 }
 
+export interface JourneyInput {
+  from_zone: string;
+  to_zone: string;
+}
+
+export interface JourneyResult {
+  from_zone: string;
+  to_zone: string;
+  fare: number;
+}
+
 export interface FareCalculationRequest {
-  from_zone: number;
-  to_zone: number;
-  user_id?: string;
+  user_id: string;
+  journeys: JourneyInput[];
 }
 
 export interface FareCalculationResponse {
   success: boolean;
-  data: {
-    from_zone: number;
-    to_zone: number;
-    fare: number;
-    journey_id?: number;
-    timestamp?: string;
-    user_id?: string;
+  data?: {
+    user_id: string;
+    journeys: JourneyResult[];
+    total_fare: number;
   };
-  journey?: {
-    id: number;
-    user_id?: string;
-    from_zone: string;
-    to_zone: string;
-    fare: number;
-    fare_display: number;
-    timestamp: string;
-  };
+  error?: string;
+  errors?: any;
 }
 
+export interface JourneyCountResponse {
+  count: number;
+}
+
+export interface ErrorResponse {
+  success: boolean;
+  error?: string;
+  errors?: any;
+}
