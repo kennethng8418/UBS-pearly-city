@@ -8,6 +8,7 @@ from .views import (
     FareRulesAPIView,
     JourneyHistoryAPIView,
     UserJourneyHistoryAPIView,
+    UserJourneyHistoryCountAPIView,
 )
 
 app_name = 'api'
@@ -19,5 +20,7 @@ urlpatterns = [
     path('fare-rules/', FareRulesAPIView.as_view(), name='fare-rules'),
     path('journeys/', JourneyHistoryAPIView.as_view(), name='journey-history'),
     path('users/<str:user_id>/journeys/', UserJourneyHistoryAPIView.as_view(), name='user-journeys'),
-]
+    path('users/<str:user_id>/journeys/count', UserJourneyHistoryCountAPIView.as_view(), name='user-journeys'),
+
+    ]
 

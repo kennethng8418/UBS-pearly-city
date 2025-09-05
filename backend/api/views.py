@@ -76,8 +76,8 @@ class CalculateFareAPIView(APIView):
             user_id=user_id,
             timestamp__date=today
         ).count()
-
-        if existing_journeys_count >= MAX_JOURNEYS_PER_DAY:
+        new_journeys_count = len(journeys)
+        if existing_journeys_count+new_journeys_count > MAX_JOURNEYS_PER_DAY:
             return Response(
                 {
                     "success": False,
@@ -229,4 +229,34 @@ class UserJourneyHistoryAPIView(APIView):
             'user_id': user_id,
             'journeys': serializer.data,
             'count': journeys.count()
+        }, status=status.HTTP_200_OK)
+    
+class UserJourneyHistoryCountAPIView(APIView):
+    '''
+    Get journey history for a specific user.
+    
+    GET /api/users/{user_id}/journeys/count
+    '''
+    
+    def get(self, request, user_id=None):
+        '''Get journey history for a specific user.'''
+        # Get user_id from URL path or query parameters
+        if not user_id:
+            user_id = request.query_params.get('user_id')
+        
+        if not user_id:
+            return Response(
+                {
+                    'success': False,
+                    'error': 'user_id is required'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        today = timezone.now().date()
+        journeysCount = Journey.objects.filter(
+            user_id=user_id, 
+            timestamp__date=today).count()
+        
+        return Response({
+            'count': journeysCount
         }, status=status.HTTP_200_OK)
