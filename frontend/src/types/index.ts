@@ -42,8 +42,10 @@ export interface JourneyCountResponse {
   count: number;
 }
 
-export interface ErrorResponse {
-  success: boolean;
-  error?: string;
-  errors?: any;
+export interface FareCalculationState {
+  journeys: JourneyResult[];
+  totalFare: number;
+  userId: string;
+  calculationDate: string;
+  journeyCount: number;
 }
